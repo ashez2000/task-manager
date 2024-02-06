@@ -1,13 +1,23 @@
 import fs from 'node:fs'
 import crypto from 'node:crypto'
+import { TaskInput } from '../schema/task.js'
 
-const tasks = JSON.parse(fs.readFileSync('./data/tasks.json', 'utf8')) as Task[]
+const priorities = ['low', 'medium', 'high']
+const tasks = JSON.parse(fs.readFileSync('./data/tasks.json', 'utf8')).map(
+  (t: any) => {
+    return {
+      ...t,
+      priority: priorities[crypto.randomInt(3)],
+    }
+  }
+) as Task[]
 
 export type Task = {
   id: number
   title: string
   description: string
   completed: boolean
+  priority: 'low' | 'medium' | 'high'
 }
 
 class TaskStore {
@@ -31,6 +41,12 @@ class TaskStore {
     return tasks
   }
 
+  findByPriority(priority: 'low' | 'medium' | 'high'): Task[] {
+    let tasks = [...this.store.values()]
+    tasks = tasks.filter((t) => t.priority === priority)
+    return tasks
+  }
+
   findById(id: number): Task | null {
     const task = this.store.get(id)
     if (!task) {
@@ -40,7 +56,8 @@ class TaskStore {
     return task
   }
 
-  create(title: string, description: string, completed: boolean): Task {
+  create(input: TaskInput): Task {
+    const { title, description, completed, priority } = input
     const id = crypto.randomInt(10_000)
 
     const task = {
@@ -48,6 +65,7 @@ class TaskStore {
       title,
       description,
       completed,
+      priority,
     }
 
     this.store.set(id, task)
@@ -55,25 +73,13 @@ class TaskStore {
     return task
   }
 
-  updateById(
-    id: number,
-    title: string,
-    description: string,
-    completed: boolean
-  ): Task | null {
+  updateById(id: number, input: TaskInput): Task | null {
     const task = this.store.get(id)
     if (!task) {
       return null
     }
 
-    const update = {
-      id,
-      title,
-      description,
-      completed,
-    }
-
-    this.store.set(id, update)
+    this.store.set(id, { id, ...input })
 
     return task
   }

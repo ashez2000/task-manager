@@ -13,6 +13,7 @@ test('POST /tasks', async () => {
     title: 'New Task',
     description: 'New Task Description',
     completed: false,
+    priority: 'low',
   }
 
   const res = await supertest(app).post('/tasks').send(newTask)
@@ -54,6 +55,7 @@ test('PUT /tasks/:id', async () => {
     title: 'Updated Task',
     description: 'Updated Task Description',
     completed: true,
+    priority: 'low',
   }
 
   const res = await supertest(app).put('/tasks/1').send(updatedTask)
@@ -65,6 +67,7 @@ test('PUT /tasks/:id with invalid id', async () => {
     title: 'Updated Task',
     description: 'Updated Task Description',
     completed: true,
+    priority: 'low',
   }
 
   const res = await supertest(app).put('/tasks/999').send(updatedTask)
