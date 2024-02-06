@@ -21,8 +21,14 @@ class TaskStore {
     }
   }
 
-  findMany(): Task[] {
-    return [...this.store.values()]
+  findMany(completed: 'true' | 'false' | 'undefined'): Task[] {
+    let tasks = [...this.store.values()]
+
+    if (completed !== 'undefined') {
+      tasks = tasks.filter((t) => t.completed.toString() === completed)
+    }
+
+    return tasks
   }
 
   findById(id: number): Task | null {

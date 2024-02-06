@@ -5,7 +5,14 @@ import taskStore from '../store/task.js'
 const router = Router()
 
 router.get('/', (req, res) => {
-  const tasks = taskStore.findMany()
+  const completed = new String(req.query.completed).toString()
+  if (!['true', 'false', 'undefined'].includes(completed)) {
+    return res.status(400).json({
+      message: 'invalid value for query param: completed',
+    })
+  }
+
+  const tasks = taskStore.findMany(completed as any)
   res.status(200).json(tasks)
 })
 
