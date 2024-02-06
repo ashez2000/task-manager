@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { taskInputSchema } from '../schema/task.js'
 import taskStore from '../store/task.js'
 
 const router = Router()
@@ -9,7 +10,7 @@ router.get('/', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-  const { title, description, completed } = req.body
+  const { title, description, completed } = taskInputSchema.parse(req.body)
 
   const task = taskStore.create(title, description, completed)
   res.status(201).send(task)
@@ -41,7 +42,7 @@ router.put('/:id', (req, res) => {
     })
   }
 
-  const { title, description, completed } = req.body
+  const { title, description, completed } = taskInputSchema.parse(req.body)
 
   const task = taskStore.updateById(id, title, description, completed)
   if (!task) {
